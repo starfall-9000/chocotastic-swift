@@ -8,7 +8,7 @@ https://www.raywenderlich.com/900-getting-started-with-rxswift-and-rxcocoa
 
 delegate (extension / protocol)
 
-implement table-view
+implement table-view (delegate / datasource)
 
 singleton (static let)
 
@@ -18,8 +18,11 @@ Variable<[Chocolate]> = Variable([])
 
 *rxswift*
 
-asObservable().subscribe(onNext:).addDisposable()
+Observable.just()
+
+asObservable().subscribe(onNext:).disposed(by:)
+
+bind(to:view.rx).disposed(by:) using for bind table view datasource
 
 DisposeBag - ensure observers clean up when deinit()
-
 
