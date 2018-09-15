@@ -33,6 +33,8 @@ class BillingInfoViewController: UIViewController {
   @IBOutlet private var purchaseButton: UIButton!
   
   private let cardType: Variable<CardType> = Variable(.Unknown)
+  private let disposeBag = DisposeBag()
+  private let throttleInterval = 0.1
   
   //MARK: - View Lifecycle
   
@@ -41,6 +43,8 @@ class BillingInfoViewController: UIViewController {
     
     title = "💳 Info"
     
+    setupCardImageDisplay()
+    setupTextChangeHandling()
   }
   
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -58,7 +62,62 @@ class BillingInfoViewController: UIViewController {
   
   //MARK: - RX Setup
 
+  private func setupCardImageDisplay() {
+    cardType
+      .asObservable()
+      .subscribe(onNext: { cardType in
+        self.creditCardImageView.image = cardType.image
+      })
+      .disposed(by: disposeBag)
+  }
   
+  private func setupTextChangeHandling() {
+    let creditCardValid =
+      creditCardNumberTextField
+        .rx
+        .text
+        .throttle(throttleInterval, scheduler: MainScheduler.instance)
+        .map { self.validate(cardText: ($0)!) }
+    
+    creditCardValid
+      .subscribe(onNext: {
+        self.creditCardNumberTextField.valid = $0
+      })
+      .disposed(by: disposeBag)
+    
+    let expirationValid =
+      expirationDateTextField
+        .rx
+        .text
+        .throttle(throttleInterval, scheduler: MainScheduler.instance)
+        .map { self.validate(expirationDateText: ($0)!) }
+    
+    expirationValid
+      .subscribe(onNext: {
+        self.expirationDateTextField.valid = $0
+      })
+      .disposed(by: disposeBag)
+    
+    let cvvValid =
+      cvvTextField
+        .rx
+        .text
+        .map { self.validate(cvvText: ($0)!) }
+    
+    cvvValid
+      .subscribe(onNext: {
+        self.cvvTextField.valid = $0
+      })
+      .disposed(by: disposeBag)
+    
+    let everythingValid = Observable.combineLatest(creditCardValid, expirationValid, cvvValid) {
+      $0 && $1 && $2
+    }
+    
+    everythingValid
+      .bind(to: purchaseButton.rx.isEnabled)
+      .disposed(by: disposeBag)
+  }
 
   //MARK: - Validation methods
   
