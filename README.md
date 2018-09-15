@@ -32,3 +32,65 @@ throttle, debounce
 
 DisposeBag - ensure observers clean up when deinit()
 
+### reactive cocoa notes
+
+Reactive Cocoa Basic
+
+pod 'libextobjc'
+
+Subscribe Next
+
+Filter
+
+Map
+
+Combine
+
+Create Signal
+
+Flatten Map (Signal of Signal)
+
+Do Next (side effect)
+
+Then (chaining)
+
+Deliver On (threadings)
+
+Throttle
+
+====
+
+signal (create signal, signal for selector)
+
+emit
+
+subscribe (next, complete, error)
+
+disposable
+
+====
+
+NOTICE
+
+Retain Cycles
+
+LinqToObjectiveC
+
+====
+
+Reactive Cocoa Advance
+
+distinctUntilChanged
+
+command
+
+command excuting (not)
+
+tuple
+
+push view model (navigation)
+
+binding table view
+
+(motion design)
+
