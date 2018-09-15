@@ -47,11 +47,10 @@ class ChocolatesOfTheWorldViewController: UIViewController {
   
   //MARK: Rx Setup
   
-  
   //MARK: Imperative methods
   
   func updateCartButton() {
-    cartButton.title = "\(ShoppingCart.sharedCart.chocolates.count) 🍫"
+    cartButton.title = "\(ShoppingCart.sharedCart.chocolates.value.count) 🍫"
   }
 }
 
@@ -90,7 +89,7 @@ extension ChocolatesOfTheWorldViewController: UITableViewDelegate {
     tableView.deselectRow(at: indexPath, animated: true)
     
     let chocolate = europeanChocolates[indexPath.row]
-    ShoppingCart.sharedCart.chocolates.append(chocolate)
+    ShoppingCart.sharedCart.chocolates.value.append(chocolate)
     updateCartButton()
   }
 }
