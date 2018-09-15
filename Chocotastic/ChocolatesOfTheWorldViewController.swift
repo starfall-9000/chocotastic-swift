@@ -31,27 +31,15 @@ class ChocolatesOfTheWorldViewController: UIViewController {
   let europeanChocolates = Observable.just(Chocolate.ofEurope)
   let disposeBag = DisposeBag()
   
-  private func setupCellConfiguration() {
-    europeanChocolates
-      .bind(to:
-        tableView
-          .rx
-          .items(cellIdentifier: ChocolateCell.Identifier, cellType: ChocolateCell.self)) {
-            row, chocolate, cell in
-            cell.configureWithChocolate(chocolate: chocolate)
-      }
-      .disposed(by: disposeBag)
-  }
-  
   //MARK: View Lifecycle
   
   override func viewDidLoad() {
     super.viewDidLoad()
     title = "Chocolate!!!"
 
-//    tableView.delegate = self
     setupCartObserver()
     setupCellConfiguration()
+    setupCellTapHandling()
   }
   
   //MARK: Rx Setup
@@ -64,18 +52,32 @@ class ChocolatesOfTheWorldViewController: UIViewController {
       })
       .disposed(by: disposeBag)
   }
+  
+  private func setupCellConfiguration() {
+    europeanChocolates
+      .bind(to:
+        tableView
+          .rx
+          .items(cellIdentifier: ChocolateCell.Identifier, cellType: ChocolateCell.self)) {
+            row, chocolate, cell in
+            cell.configureWithChocolate(chocolate: chocolate)
+      }
+      .disposed(by: disposeBag)
+  }
+  
+  private func setupCellTapHandling() {
+    tableView
+      .rx
+      .modelSelected(Chocolate.self)
+      .subscribe(onNext: { chocolate in
+        ShoppingCart.sharedCart.chocolates.value.append(chocolate)
+        if let selectedRowIndexPath = self.tableView.indexPathForSelectedRow {
+          self.tableView.deselectRow(at: selectedRowIndexPath, animated: true)
+        }
+      })
+      .disposed(by: disposeBag)
+  }
 }
-
-// MARK: - Table view delegate
-//extension ChocolatesOfTheWorldViewController: UITableViewDelegate {
-//
-//  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//    tableView.deselectRow(at: indexPath, animated: true)
-//
-//    let chocolate = europeanChocolates[indexPath.row]
-//    ShoppingCart.sharedCart.chocolates.value.append(chocolate)
-//  }
-//}
 
 // MARK: - SegueHandler
 extension ChocolatesOfTheWorldViewController: SegueHandler {
